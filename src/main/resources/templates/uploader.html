@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Upload File</title>
+  <style>
+    :root {
+      --primary: #2F80ED;
+      --primary-hover: #1c5fc4;
+      --text: #333;
+      --bg: #f9fafb;
+      --white: #ffffff;
+      --border: #e5e7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: var(--text);
+      padding: 20px;
+    }
+
+    .container {
+      background: var(--white);
+      padding: 30px 40px;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 450px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-weight: 700;
+      font-size: 1.9rem;
+      color: var(--primary);
+    }
+
+    input[type="file"] {
+      display: block;
+      margin: 0 auto 30px auto;
+      cursor: pointer;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      width: 100%;
+      max-width: 320px;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="file"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 5px var(--primary);
+    }
+
+    button {
+      background-color: var(--primary);
+      color: var(--white);
+      border: none;
+      padding: 14px 0;
+      width: 100%;
+      max-width: 320px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+
+    button:disabled {
+      background-color: #a3bffa;
+      cursor: not-allowed;
+    }
+
+    button:hover:not(:disabled) {
+      background-color: var(--primary-hover);
+    }
+
+    #status {
+      margin-top: 25px;
+      font-size: 1rem;
+      min-height: 1.4em;
+    }
+
+    #status.success {
+      color: #2a9d8f;
+      font-weight: 600;
+    }
+
+    #status.error {
+      color: #e63946;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>📤 Upload Your File</h1>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" id="fileInput" name="file" required />
+    <button type="submit" disabled>Upload</button>
+  </form>
+  <div id="status"></div>
+</div>
+
+<script>
+  const fileInput = document.getElementById('fileInput');
+  const uploadButton = document.querySelector('button[type="submit"]');
+  const statusDiv = document.getElementById('status');
+
+  // Enable button only when file is selected
+  fileInput.addEventListener('change', () => {
+    uploadButton.disabled = !fileInput.files.length;
+    statusDiv.textContent = '';
+    statusDiv.className = '';
+  });
+
+  document.getElementById('uploadForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    statusDiv.textContent = '';
+    statusDiv.className = '';
+
+    if (!fileInput.files.length) {
+      statusDiv.textContent = 'Please select a file to upload.';
+      statusDiv.className = 'error';
+      return;
+    }
+
+    uploadButton.disabled = true;
+    uploadButton.textContent = 'Uploading...';
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    fetch('/api/files/upload', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => {
+      uploadButton.disabled = false;
+      uploadButton.textContent = 'Upload';
+
+      if (response.ok) {
+        statusDiv.textContent = '✅ File uploaded successfully!';
+        statusDiv.className = 'success';
+        fileInput.value = '';
+        uploadButton.disabled = true;
+      } else {
+        throw new Error('Upload failed');
+      }
+    })
+    .catch(() => {
+      uploadButton.disabled = false;
+      uploadButton.textContent = 'Upload';
+      statusDiv.textContent = '❌ File upload failed. Please try again.';
+      statusDiv.className = 'error';
+    });
+  });
+</script>
+
+</body>
+</html>

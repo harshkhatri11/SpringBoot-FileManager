@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>File Manager</title>
+  <style>
+    :root {
+      --primary: #2F80ED;
+      --text: #333;
+      --bg: #f9fafb;
+      --white: #ffffff;
+      --border: #e5e7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      padding: 40px;
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 960px;
+      margin: auto;
+      background-color: var(--white);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 25px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      color: var(--primary);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 14px 20px;
+      text-align: left;
+      font-size: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background-color: #f1f5f9;
+      color: #111827;
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+
+    a.download-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      border: 1px solid var(--primary);
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: 0.2s ease;
+      display: inline-block;
+    }
+
+    a.download-link:hover {
+      background-color: var(--primary);
+      color: var(--white);
+    }
+
+    .no-files {
+      text-align: center;
+      padding: 30px;
+      color: #999;
+      font-style: italic;
+    }
+
+    @media (max-width: 600px) {
+      th, td {
+        font-size: 0.9rem;
+        padding: 10px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      a.download-link {
+        padding: 5px 10px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>📁 Files in Storage</h1>
+
+  <table th:if="${files != null && !files.isEmpty()}">
+    <thead>
+    <tr>
+      <th>File Name</th>
+      <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="file : ${files}">
+      <td th:text="${file}"></td>
+      <td>
+        <a class="download-link" th:href="@{/api/files/download-faster(fileName=${file})}">
+          Download
+        </a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div class="no-files" th:if="${files == null || files.isEmpty()}">
+    No files found in the storage directory.
+  </div>
+</div>
+</body>
+</html>
